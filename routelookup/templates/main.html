@@ -1,0 +1,101 @@
+{% extends 'layout.html' %}
+{% block style %}
+<style>
+    .grey-te-highlight {
+    background-color: rgba(86,61,124,0.15);
+    border: 1px solid rgba(86,61,124,0.15);
+    }
+
+    .start-35 {
+        left: 35%!important;
+    }
+</style>
+{% endblock %}
+{% block body %}
+</script>
+<div id="intro" class="container-fluid">
+    <div id="desc" class="mt-3 mb-3">
+        <div id="desc-header" class="mx-auto">
+            <span id="header-text" class="d-block shadow p-3 bg-secondary text-white">Usage of Tool</span>
+        </div>
+        <div id="desc-txt" class="mt-2 p-3 mx-auto">
+            <p class="text-center fs-4 text-break">
+                This tool is aimed to help you decide on a route to do if your stuck. Through accessing real-life data of current flights, it is able to provide the aircraft type, callsign, origin airport, and destination airport. You are able to search by using the icao, name, and code of airports thru the input below. 
+            </p>
+        </div>
+    </div>
+</div>
+<div id="airline-form" class="container-fluid">
+    <div id="form-spacer" class="mt-3 mb-3">
+        <div id="form-header" class="mx-auto">
+            <span id="form-header" class="d-block shadow p-3 bg-secondary text-white lh-sm">Init Tool</span>
+        </div>
+        <div id="form-body" class="mt-2 mb-3 p-3 mx-auto">
+            <form id="airline-root-form" class="row g-3" method="POST">
+                {{ initializer_form.csrf_token }}
+                <div class="col-auto">
+                    <label for="airline-input">
+                        <p class="text-start fs-6 fw-lighter text-decoration-underline">Airline ICAO: </p>
+                    </label>
+                    {{ initializer_form.initializer }}
+                    <div class="position-relative">
+                        <div id="airline-help" class="position-absolute start-35 form-text">
+                            Enter airline ICAO, Code, or name
+                        </div>
+                    </div>
+                    <div id="errs" class="mt-5">
+                        {% if initializer_form.initializer.errors %}
+                        <ul class="list-group list-group-flush list-group-numbered">
+                            {% for error in initializer_form.initializer.errors %}
+                            <li class="list-group-item list-group-item-danger">
+                                {{ error|safe }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-auto">
+                    {{ initializer_form.submit_btn }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--Div below: For routes table-->
+<div id="routes-table" class="container-fluid overflow-hidden">
+    <div id="table spacer" class="mt-5 mb-3">
+        <span id="table-header" class="d-block shadow p-3 bg-secondary text-white lh-sm">Result:</span>
+    </div>
+    <div id="table" class="mt-2 mx-auto">
+        <div class="table-responsive">
+            <table class="table table-borderless table-striped table-sm caption-top">
+                        <caption>
+                                <p class="text-center fw-bolder text-decoration-underline grey-te-highlight">Airline: {% if config.AIRLINE_LIST %}{{ config.AIRLINE_LIST.get("name") }}  ({{ config.AIRLINE_LIST.get("code") }}){% else %} None {% endif %}</p>
+                        </caption>
+                <thead>
+                    <tr>
+                        <th scope="col" class="p-0">A/C Type</th>
+                        <th scope="col" class="p-0">Callsign</th>
+                        <th scope="col" class="p-0">Origin</th>
+                        <th scope="col" class="p-0">Destination</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if config.AIRLINE_LIST %}
+                    {% for route in config.AIRLINE_LIST %}
+                    <tr>
+                        <th scope="row" class="p-2">{{ route.actype }}</th>
+                        <td class="p-2">{{ route.callsign }}</td>
+                        <td class="p-2">{{ route.origin }}</td>
+                        <td class="p-2">{{ route.destination }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

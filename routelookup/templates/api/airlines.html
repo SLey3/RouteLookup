@@ -1,0 +1,22 @@
+{% extends 'api_layout.html' %}
+{% block body %}
+<a href="{{ url_for('routes.main_redirect') }}">Home Page</a>
+<table>
+    <thead>
+        <tr>
+            <th scope="col">Airline Name</th>
+            <th scope="col">Airline ICAO</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for airlineinf in airlines %}
+        <tr>
+            <th scope="row">{{ airlineinf[0] }}</th>
+            <td>{{ airlineinf[1] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<br>
+<a href="{{ url_for('routes.main_redirect') }}">Home Page</a>
+{% endblock %}
