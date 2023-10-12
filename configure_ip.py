@@ -9,7 +9,7 @@ copy and paste --> sudo python3 configure_ip.py
 
 Linux:
 
-copy and paste --> su python3 configure_ip.py
+copy and paste --> su python configure_ip.py
 
 
 Windows (CMD Terminal):
@@ -18,7 +18,7 @@ highly recommended to install gsudo (https://github.com/gerardog/gsudo)
 
 gsudo command:
 
-copy and paste --> sudo python3 configure_ip.py
+copy and paste --> sudo python configure_ip.py
 
 """
 # imports
