@@ -85,9 +85,20 @@
                                 <p class="card-text mb-2">Update routes table for current airline flight ops</p>
                                 <div class="my-4">
                                     <form class="row g-3" method="post">
+                                        {{ refresh_form.csrf_token }}
                                         <div class="col-auto mx-auto">
-                                            <input type="hidden" name="data-refresh-table" value="refresh-table"/>
-                                            <button type="submit" class="btn btn-primary mb-3">Refresh</button>
+                                            {{ refresh_form.refresh }}
+                                        </div>
+                                        <div class="col-auto">
+                                            {% if refresh_form.refresh.errors %}
+                                            <ul class="list-group list-group-flush list-group-numbered">
+                                                {% for error in refresh_form.refresh.errors %}
+                                                <li class="list-group-item list-group-item-danger">
+                                                    {{ error|safe }}
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% endif %}
                                         </div>
                                     </form>
                                 </div>
@@ -110,6 +121,7 @@
                                     <form class="row g-3" method="post">
                                         <div class="btn-group" role="group" aria-label="route generator enabler">
                                             <form method="post">
+                                            {{ navigraph_form.csrf_token }}
                                             {{ navigraph_form.enable }}
                                             {{ navigraph_form.disable }}
                                             </form>

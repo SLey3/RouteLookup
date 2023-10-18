@@ -5,7 +5,7 @@ from Config import config as cg
 from pathlib import Path
 from forms import (
     AirlineInitForm, Config_FlightRadarPWDForm, Config_FlightRadarUSRForm,
-    Config_NavigraphEnableForm
+    Config_NavigraphEnableForm, Config_RefreshTable
     )
 from form_validators import AirlineICAORequired
 
@@ -46,16 +46,24 @@ def config():
     usr_form = Config_FlightRadarUSRForm()
     pwd_form = Config_FlightRadarPWDForm()
     navigraph_form = Config_NavigraphEnableForm()
+    refresh_form = Config_RefreshTable()
     if request.method == 'POST':
-        if usr_form.data['email']:
+        if usr_form.email_submit.data:
             if usr_form.validate():
                 cg.FLIGHTRADAR_USERNAME = usr_form.email.data
                 cg.FLIGHTRADAR_API = FlightRadar24API(cg.FLIGHTRADAR_USERNAME, cg.FLIGHTRADAR_PASSWORD)
-        elif pwd_form.data['pwd']:
+        elif pwd_form.pwd_submit.data:
             if pwd_form.validate():
                 cg.FLIGHTRADAR_PASSWORD = pwd_form.pwd.data
-        elif navigraph_form.enable.data:
+                cg.FLIGHTRADAR_API = FlightRadar24API(cg.FLIGHTRADAR_USERNAME, cg.FLIGHTRADAR_PASSWORD)
+        elif refresh_form.refresh.data:
+            if cg.CURRENT_AIRLINE:
+                return redirect(url_for('api.generate', icao=cg.CURRENT_AIRLINE['ICAO']), code=307)
+            else:
+                refresh_form.refresh.errors = ("No current data detected.",)
+        elif (navigraph_form.enable.data and not usr_form.email_submit.data
+              and not pwd_form.pwd_submit.data):
             cg.NAVIGRAPH_ENABLED = "Enabled"
         elif navigraph_form.disable.data:
             cg.NAVIGRAPH_ENABLED = "Disabled"
-    return render_template('config.html', usr_form=usr_form, pwd_form=pwd_form, navigraph_form=navigraph_form)
+    return render_template('config.html', usr_form=usr_form, pwd_form=pwd_form, navigraph_form=navigraph_form, refresh_form=refresh_form)

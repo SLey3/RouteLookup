@@ -1,0 +1,10 @@
+## V1.1
+- Created Config Route Generation Refresh Form (forms.py lines 138-142)
+- Added Route Generation Refresh Config Method with submition handler (routes.py lines 49, 59-63)
+- Fixed forgotten implementation in config FlightRadar password submition handler which was to update the FlightRadar24 object with the new login information (routes.py line 58)
+- Moved enable/disable navigraph route generation submition checks to bottom of submition checks (routes.py)
+- fixed bug where if any button was pressed, "Route Generation Integration" would override said buttons (routes.py lines 64-65)
+- rewrote config form checks: usr_email and pwd_email to check if their respective submit button has been pressed (routes.py lines 51-55)
+- added csrf_token to "Route Generation Implementation" config card form (config.html, line 124)
+- added full implementation of "Route Refresh" form with csrf token and errors list (config.html, lines 88-101)
+- disabled "development mode" ((Config) __init__.py line 8)

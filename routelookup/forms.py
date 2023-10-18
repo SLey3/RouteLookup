@@ -133,3 +133,10 @@ class Config_NavigraphEnableForm(FlaskForm):
                                  'value' : 'Disable',
                                  'class' : 'btn'
                              })
+    
+
+class Config_RefreshTable(FlaskForm):
+    refresh = SubmitField(render_kw={
+        'value' : 'Refresh',
+        'class' : 'btn btn-primary mb-3'
+    })

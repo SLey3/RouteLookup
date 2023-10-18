@@ -5,7 +5,7 @@ Configuration Control for the application
 from .config import DevelopmentConfig, ProductionConfig
 
 # Config Decider
-development = True # Change to False when in production mode else True
+development = False # Change to False when in production mode else True
 
 if development:
     config = DevelopmentConfig()
