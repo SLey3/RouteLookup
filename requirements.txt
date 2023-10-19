@@ -3,3 +3,6 @@ flask-WTF
 FlightRadarAPI
 python-dotenv
 wtforms[email]
+pre-commit
+black
+isort
