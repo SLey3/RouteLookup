@@ -1,4 +1,4 @@
 [flake8]
-max-line-lengths=88
-extend-ignore=E203, E704
+max-line-length=88
+extend-ignore=E203, E704, E722
 filename=routelookup/*.py

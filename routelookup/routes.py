@@ -1,69 +1,91 @@
 # Imports
-from flask import Blueprint, render_template, redirect, url_for, request
-from FlightRadar24 import FlightRadar24API
-from Config import config as cg
 from pathlib import Path
+
+from flask import Blueprint, redirect, render_template, request, url_for
+from FlightRadar24 import FlightRadar24API
+
+from Config import config as cg
+from form_validators import AirlineRequired
 from forms import (
-    AirlineInitForm, Config_FlightRadarPWDForm, Config_FlightRadarUSRForm,
-    Config_NavigraphEnableForm, Config_RefreshTable
-    )
-from form_validators import AirlineICAORequired
+    AirlineInitForm,
+    Config_FlightRadarPWDForm,
+    Config_FlightRadarUSRForm,
+    Config_NavigraphEnableForm,
+    Config_RefreshTable,
+)
 
 # routes
-FOLDER_DIR = Path(__file__).resolve().parent / 'templates'
-STATIC_DIR = Path(__file__).resolve().parent / 'static'
+FOLDER_DIR = Path(__file__).resolve().parent / "templates"
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 
-routes = Blueprint(__name__, 'routes', template_folder=FOLDER_DIR, static_folder=STATIC_DIR)
+routes = Blueprint(
+    __name__, "routes", template_folder=FOLDER_DIR, static_folder=STATIC_DIR
+)
 
-@routes.route('/', methods=['GET'])
+
+@routes.route("/", methods=["GET"])
 def main_redirect():
-    return redirect(url_for('routes.main'))
+    return redirect(url_for("routes.main"))
 
-@routes.route('/', methods=['GET', 'POST'], subdomain='application')
+
+@routes.route("/", methods=["GET", "POST"], subdomain="application")
 def main():
-    form = AirlineInitForm()
+    init_form = AirlineInitForm()
 
-    form.add_validator_to(
-        "initializer", 
-        AirlineICAORequired(f'''
-        Must be an airline ICAO code. Please refer to: <a id="err-icao" href="{url_for("api.airlines")}" class="link-danger">List of Airlines</a> for a list of airlines with ICAO codes listed.
-        ''')
-    )
-    
-    if form.validate_on_submit():
-        icao = form.initializer.data
+    init_form.add_validator_to("initializer", AirlineRequired(url_for("api.airlines")))
 
-        return redirect(url_for('api.generate', icao=icao), code=307)
+    if init_form.validate_on_submit():
+        icao = init_form.initializer.data.capitalize()
 
-    return render_template('main.html', initializer_form=form)
+        return redirect(url_for("api.generate", icao=icao), code=307)
 
-@routes.route('/config', methods=['GET'], subdomain='application')
+    return render_template("main.html", initializer_form=init_form)
+
+
+@routes.route("/config", methods=["GET"], subdomain="application")
 def config_redirect():
-    return redirect(url_for('routes.config'))
+    return redirect(url_for("routes.config"))
 
-@routes.route("/config", methods=['GET', 'POST'])
+
+@routes.route("/config", methods=["GET", "POST"])
 def config():
     usr_form = Config_FlightRadarUSRForm()
     pwd_form = Config_FlightRadarPWDForm()
     navigraph_form = Config_NavigraphEnableForm()
     refresh_form = Config_RefreshTable()
-    if request.method == 'POST':
+
+    if request.method == "POST":
         if usr_form.email_submit.data:
             if usr_form.validate():
                 cg.FLIGHTRADAR_USERNAME = usr_form.email.data
-                cg.FLIGHTRADAR_API = FlightRadar24API(cg.FLIGHTRADAR_USERNAME, cg.FLIGHTRADAR_PASSWORD)
+                cg.FLIGHTRADAR_API = FlightRadar24API(
+                    cg.FLIGHTRADAR_USERNAME, cg.FLIGHTRADAR_PASSWORD
+                )
         elif pwd_form.pwd_submit.data:
             if pwd_form.validate():
                 cg.FLIGHTRADAR_PASSWORD = pwd_form.pwd.data
-                cg.FLIGHTRADAR_API = FlightRadar24API(cg.FLIGHTRADAR_USERNAME, cg.FLIGHTRADAR_PASSWORD)
+                cg.FLIGHTRADAR_API = FlightRadar24API(
+                    cg.FLIGHTRADAR_USERNAME, cg.FLIGHTRADAR_PASSWORD
+                )
         elif refresh_form.refresh.data:
             if cg.CURRENT_AIRLINE:
-                return redirect(url_for('api.generate', icao=cg.CURRENT_AIRLINE['ICAO']), code=307)
+                return redirect(
+                    url_for("api.generate", icao=cg.CURRENT_AIRLINE["ICAO"]), code=307
+                )
             else:
                 refresh_form.refresh.errors = ("No current data detected.",)
-        elif (navigraph_form.enable.data and not usr_form.email_submit.data
-              and not pwd_form.pwd_submit.data):
+        elif (
+            navigraph_form.enable.data
+            and not usr_form.email_submit.data
+            and not pwd_form.pwd_submit.data
+        ):
             cg.NAVIGRAPH_ENABLED = "Enabled"
         elif navigraph_form.disable.data:
             cg.NAVIGRAPH_ENABLED = "Disabled"
-    return render_template('config.html', usr_form=usr_form, pwd_form=pwd_form, navigraph_form=navigraph_form, refresh_form=refresh_form)
+    return render_template(
+        "config.html",
+        usr_form=usr_form,
+        pwd_form=pwd_form,
+        navigraph_form=navigraph_form,
+        refresh_form=refresh_form,
+    )

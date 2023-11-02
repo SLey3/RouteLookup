@@ -8,3 +8,16 @@
 - added csrf_token to "Route Generation Implementation" config card form (`config.html`, line 124)
 - added full implementation of "Route Refresh" form with csrf token and errors list (`config.html`, lines 88-101)
 - disabled "development mode" ((Config) `__init__.py` line 8)
+
+## V2
+- Added handler to check if window height changes and adjusts progress bar to remain relatively close to the center of the page (`process.html` lines 6-8)
+- Added CORS support (`app.py`, lines 5, 17)
+- Added Live Search Bar (`main.html`, line 169)
+- Added `active_search` API route to handle live search inputs (`api.py` lines 83-100)
+- Added Live Search Validation function to validate for alphabetical and numerical ACII characters (`form_validators.py` lines 44-56)
+- Added Live Search Core Functionality (`main.html`, lines 15-100)
+- Added Live Search Filter options (`main.html`, lines 173-199)
+- Modified `get_airline` to get airline dict from icao, iata, or name (`routeparser.py`, lines 66-82)
+- Changed `AirlineICAORequired` to `AirlineRequired` to best reflect validator change + description and validator core functionality (`form_validators.py`, lines 10-25)
+- Airline Init POST process now supports lower case inputs thru capitalizing said input before processing it to the api page (`routes.py` line 38)
+- removed `navigraphEnabled` which was an unused route which will have remained unused if left (`api.py`)

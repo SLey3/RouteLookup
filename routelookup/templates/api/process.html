@@ -3,6 +3,9 @@
 <script>
     $(document).ready(function(){
         $(":root").get(0).style.setProperty("--screen-y", $(window).height());
+        $(window).on('resize', function(){
+            $(":root").get(0).style.setProperty("--screen-y", $(window).height());
+        });
     });
 </script>
 <style>
@@ -30,7 +33,7 @@
         const res = $.ajax({
             url: "{{ url_for('api.generation_status') }}",
             method: 'GET',
-            dataType: "json"
+            dataType: 'json'
         });
 
         res.done(function (data) {

@@ -1,5 +1,6 @@
 flask
 flask-WTF
+flask-cors
 FlightRadarAPI
 python-dotenv
 wtforms[email]

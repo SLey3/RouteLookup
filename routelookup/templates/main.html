@@ -12,6 +12,92 @@
 </style>
 {% endblock %}
 {% block body %}
+<script>
+    $(document).ready(function(){
+        let api_url;
+
+        function getFilter () {
+            let id_list = ["#ac-type-check", "#callsign-check", "#origin-check", "#dest-check"];
+            let filter;
+
+
+            for (let i = 0; i < id_list.length; i++) {
+                var id = id_list[i];
+
+                let val = $(`input:radio[name=search-check]${id}:checked`).val();
+
+                if(val) {
+                    if(id == "#ac-type-check") {
+                        filter = "a/c";
+                        break;
+                    }
+                    else if(id == "#callsign-check"){
+                        filter = "callsign";
+                        break;
+                    } else if (id == "#origin-check") {
+                        filter = "origin";
+                        break;
+                    } else if(id == "#dest-check") {
+                        filter = "destination";
+                        break;
+                    }
+                }
+            }
+
+            return filter;
+        }
+
+        $("input#tbl-search").on('input', (e) => {
+            api_url = "{{ url_for('api.active_search') }}"
+
+            const res = $.ajax({
+                url: api_url,
+                method: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: {
+                    'query': e.target.value.toUpperCase()
+                }
+            });
+
+            res.done(function(data) {
+
+
+                let filter = getFilter();
+
+                if (data.invalid) {
+                    let items = [];
+                    
+                    data.errors.forEach(error => {
+                        items.push(`<li class="list-group-item list-group-item-danger"> ${error} </li>`);
+                    });
+
+                    $("#live-search-errs-list").html(items.toString());
+                } else {
+                    $("#live-search-errs-list").empty();
+
+                    $("#airline-table tbody tr").each(function(){
+                        let children = $(this).children().toArray();
+
+                        for (let i = 0; i < children.length; i++) {
+                            let elem = children[i];
+                            let filter_attr = $(elem).attr("data-search-type");
+                            let elem_data = $(elem).attr("data-search-id");
+
+                            if(filter_attr == filter) {
+                                if(elem_data.includes(data.query)) {
+                                    $(elem).parent().show();
+                                } else {
+                                    $(elem).parent().hide();
+                                }
+                                break;
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    });
 </script>
 <div id="intro" class="container-fluid">
     <div id="desc" class="mt-3 mb-3">
@@ -70,11 +156,49 @@
     </div>
     <div id="table" class="mt-2 mx-auto">
         <div class="table-responsive">
-            <table class="table table-borderless table-striped table-sm caption-top">
+            <table id="airline-table" class="table table-borderless table-striped table-sm caption-top">
                         <caption>
                                 <p class="text-center fw-bolder text-decoration-underline grey-te-highlight">Airline: {% if config.AIRLINE_LIST %}{{ config.AIRLINE_LIST.get("name") }}  ({{ config.AIRLINE_LIST.get("code") }}){% else %} None {% endif %}</p>
                         </caption>
                 <thead>
+                    <div class="p-3 m-3">
+                        <form id="airline-tbl-search" class="g-3">
+                            <label for="tbl-search">
+                                <p class="text-start fs-6 fw-lighter text-decoration-underline">Search: </p>
+                            </label>
+                            <input id="tbl-search" type="text" placeholder="Type keyword... (can be callsign, origin, destination, aircraft type)"  maxlength="20" class="form-control" aria-describedby="live-search-lbl" />
+                            <div id="live-search-errs" class="mt-5">
+                                <ul id="live-search-errs-list" class="list-group list-group-flush list-group-numbered"></ul>
+                            </div>
+                            <div id="live-search-checks-header" class="p-3">
+                                <p class="text-start fs-2 fw-bold">Filter By:</p>
+                            </div>
+                            <div id="live-search-checks-ac-type" class="form-check form-check-inline">
+                                <input id="ac-type-check" class="form-check-input" type="radio" name="search-check" checked/>
+                                <label for="ac-type-check" class="fom-check-label">
+                                    A/C Type
+                                </label>
+                            </div>
+                            <div id="live-search-checks-callsign" class="form-check form-check-inline">
+                                <input id="callsign-check" class="form-check-input" type="radio" name="search-check"/>
+                                <label for="callsign-check" class="form-check-label">
+                                    Callsign
+                                </label>
+                            </div>
+                            <div id="live-search-checks-origin" class="form-check form-check-inline">
+                                <input id="origin-check" class="form-check-input" type="radio" name="search-check" />
+                                <label for="origin-check" class="form-check-label">
+                                    Origin
+                                </label>
+                            </div>
+                            <div id="live-search-checks-dest" class="form-check form-check-inline">
+                                <input id="dest-check" class="form-check-input" type="radio" name="search-check" />
+                                <label for="dest-check" class="form-check-label">
+                                    Destination
+                                </label>
+                            </div>
+                        </form>
+                    </div>
                     <tr>
                         <th scope="col" class="p-0">A/C Type</th>
                         <th scope="col" class="p-0">Callsign</th>
@@ -86,10 +210,10 @@
                     {% if config.AIRLINE_LIST %}
                     {% for route in config.AIRLINE_LIST %}
                     <tr>
-                        <th scope="row" class="p-2">{{ route.actype }}</th>
-                        <td class="p-2">{{ route.callsign }}</td>
-                        <td class="p-2">{{ route.origin }}</td>
-                        <td class="p-2">{{ route.destination }}</td>
+                        <th data-search-type="a/c" data-search-id="{{ route.actype }}" scope="row" class="p-2">{{ route.actype }}</th>
+                        <td data-search-type="callsign" data-search-id="{{ route.callsign }}" class="p-2">{{ route.callsign }}</td>
+                        <td data-search-type="origin" data-search-id="{{ route.origin }}" class="p-2">{{ route.origin }}</td>
+                        <td data-search-type="destination" data-search-id="{{ route.destination }}" class="p-2">{{ route.destination }}</td>
                     </tr>
                     {% endfor %}
                     {% endif %}
