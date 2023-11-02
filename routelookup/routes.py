@@ -13,6 +13,7 @@ from forms import (
     Config_NavigraphEnableForm,
     Config_RefreshTable,
 )
+from routeparser import get_airline
 
 # routes
 FOLDER_DIR = Path(__file__).resolve().parent / "templates"
@@ -35,7 +36,7 @@ def main():
     init_form.add_validator_to("initializer", AirlineRequired(url_for("api.airlines")))
 
     if init_form.validate_on_submit():
-        icao = init_form.initializer.data.capitalize()
+        icao = get_airline(init_form.initializer.data.capitalize())["ICAO"]
 
         return redirect(url_for("api.generate", icao=icao), code=307)
 

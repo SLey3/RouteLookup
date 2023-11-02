@@ -7,7 +7,6 @@ from wtforms.validators import Email, InputRequired, ValidationError
 from wtforms.widgets import html_params
 
 from Config import config
-from form_validators import AtLength
 
 
 # widget and field
@@ -62,7 +61,7 @@ class NavigraphField(SubmitField):
 # forms
 class AirlineInitForm(FlaskForm):
     initializer = StringField(
-        validators=[InputRequired("Missing Input"), AtLength(3, "ICAO code")],
+        validators=[InputRequired("Missing Input")],
         id="airline-input",
         render_kw={
             "class": "form-control-sm",

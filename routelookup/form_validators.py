@@ -11,13 +11,13 @@ def AirlineRequired(url):
     """
     Validates whether the form data matches a valid airline or not
     """
-    message = f"""Must be an airline ICAO code.
+    message = f"""Must be a valid airline.
     Please refer to:
     <a id="err-icao" href="{url}" class="link-danger">List of Airlines</a>
     for a list of airlines with ICAO codes listed."""
 
     def _airline(form, field):
-        airline = get_airline(field.data)
+        airline = get_airline(field.data.capitalize())
 
         if not airline:
             raise ValidationError(message)
