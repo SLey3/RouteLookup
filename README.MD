@@ -1,4 +1,4 @@
-# _RouteLookup_ V1.0
+# _RouteLookup_ V2.0
 
 This website brings in a tool for flight simulator users to be able to decide a route to take by allowing them to input the airline ICAO code and recieve a list of all available routes taken from FlightRader24, organizing the data by: 
 1) aircraft type (in ICAO form)
